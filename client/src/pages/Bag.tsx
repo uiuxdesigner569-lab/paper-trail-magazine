@@ -10,7 +10,6 @@ const palettes = [
   { name: "Butter", accent: "#f4ed36", background: "#f9cc73" },
   { name: "Cherry", accent: "#f8c1ba", background: "#c94245" },
   { name: "Mint", accent: "#b5c995", background: "#61609a" },
-  { name: "Cream", accent: "#f9f5f2", background: "#ac4f98" },
 ];
 
 export default function Bag() {
