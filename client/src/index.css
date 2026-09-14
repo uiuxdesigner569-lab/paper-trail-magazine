@@ -226,3 +226,6 @@ html, body, #root { max-width:100%; overflow-x:hidden; }.intro-bottom p b { colo
 /* Final in-bar hover placement with a continuous hover zone */
 .topbar-logo-wrap { min-height:66px; align-items:flex-start; padding:0 8px 20px; }.topbar-logo-wrap:after { content:""; position:absolute; left:0; right:0; bottom:0; height:24px; }.topbar-logo-art { top:auto; bottom:0; transform:translate(-50%, 0); }.topbar-logo-art .paper-pal { transform:translateY(7px); }
 @media (max-width:720px) { .topbar-logo-wrap { min-height:56px; padding-bottom:15px; }.topbar-logo-wrap:after { height:18px; }.topbar-logo-art { bottom:0; }.topbar-logo-art .paper-pal { transform:translateY(5px); } }
+
+/* TopBar hover illustration removed */
+.topbar-logo-wrap, .topbar-logo-art { display:contents; }.topbar-logo-art { display:none !important; }
