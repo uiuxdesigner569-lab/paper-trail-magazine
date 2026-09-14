@@ -68,7 +68,7 @@ export default function Home() {
   const root = useRef<HTMLElement>(null);
   const [activeCategory, setActiveCategory] = useState(0);
   const [sceneLabel, setSceneLabel] = useState("OPENING NOTE");
-  const [introEntered, setIntroEntered] = useState(false);
+  const [introEntered, setIntroEntered] = useState(() => window.sessionStorage.getItem("paper-trail-intro-entered") === "1");
   const categoryIndex = useRef(0);
 
   useEffect(() => {
@@ -78,6 +78,7 @@ export default function Home() {
   }, [activeCategory]);
 
   const enterSite = () => {
+    window.sessionStorage.setItem("paper-trail-intro-entered", "1");
     const gate = document.querySelector<HTMLElement>(".welcome-cloud-gate");
     const mascot = document.querySelector<HTMLElement>(".welcome-paper-pal");
     const target = document.querySelector<HTMLElement>(".intro-mascot");

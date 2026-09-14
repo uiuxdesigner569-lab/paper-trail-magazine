@@ -222,3 +222,7 @@ html, body, #root { max-width:100%; overflow-x:hidden; }.intro-bottom p b { colo
 /* Keep the mascot inside the TopBar wordmark hover area */
 .topbar-logo-wrap { position:relative; z-index:2; pointer-events:auto; padding-bottom:0; }.topbar-logo-wrap:hover .topbar-logo-art { opacity:1; }.topbar-logo { position:relative; z-index:2; overflow:visible; }.topbar-logo-art { top:50%; left:50%; width:42px; height:36px; z-index:3; transform:translate(-50%, 2px); transition:opacity .16s ease; }.topbar-logo-art .paper-pal { transform:translateY(11px); }.topbar-logo-art:hover { opacity:1; pointer-events:auto; }
 @media (max-width:720px) { .topbar-logo-art { width:34px; height:30px; top:50%; }.topbar-logo-art .paper-pal { transform:translateY(9px); } }
+
+/* Final in-bar hover placement with a continuous hover zone */
+.topbar-logo-wrap { min-height:66px; align-items:flex-start; padding:0 8px 20px; }.topbar-logo-wrap:after { content:""; position:absolute; left:0; right:0; bottom:0; height:24px; }.topbar-logo-art { top:auto; bottom:0; transform:translate(-50%, 0); }.topbar-logo-art .paper-pal { transform:translateY(7px); }
+@media (max-width:720px) { .topbar-logo-wrap { min-height:56px; padding-bottom:15px; }.topbar-logo-wrap:after { height:18px; }.topbar-logo-art { bottom:0; }.topbar-logo-art .paper-pal { transform:translateY(5px); } }
