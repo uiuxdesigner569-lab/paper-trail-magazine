@@ -45,9 +45,9 @@ type MagazineCategory = {
 };
 
 export const magazineCategories: MagazineCategory[] = [
-  { name: "CULTURE", slug: "culture", illustration: "/illustrations/culture.svg", label: "the stuff that sticks", accentColor: "#f8c1ba" },
-  { name: "DESIGN", slug: "design", illustration: "/illustrations/design.svg", label: "objects with opinions", accentColor: "#b5c995" },
-  { name: "PEOPLE", slug: "people", illustration: "/illustrations/people.svg", label: "the beautiful weirdos", accentColor: "#f9cc73" },
+  { name: "CULTURE", slug: "culture", illustration: "/illustrations/culture-category.png", label: "the stuff that sticks", accentColor: "#f8c1ba" },
+  { name: "DESIGN", slug: "design", illustration: "/illustrations/find-your-next-story.png", label: "objects with opinions", accentColor: "#b5c995" },
+  { name: "PEOPLE", slug: "people", illustration: "/illustrations/people-category.png", label: "the beautiful weirdos", accentColor: "#f9cc73" },
   { name: "MUSIC", slug: "music", illustration: "/illustrations/music.svg", label: "noise with a pulse", accentColor: "#ac4f98" },
   { name: "TRAVEL", slug: "travel", illustration: "/illustrations/travel.svg", label: "out of office, in mind", accentColor: "#c94245" },
 ];
