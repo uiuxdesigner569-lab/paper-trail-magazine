@@ -1,13 +1,18 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { articles, getArticle, type Article } from "../data/articles";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
 
-const storyMeta: Record<string, { author: string; date: string; excerpt: string; issue: string; illustration: string }> = {
-  culture: { author: "Mara Venn", date: "18 APR 2026", excerpt: "A field guide to sentimental clutter, tiny rituals, and the objects that refuse to leave us alone.", issue: "04", illustration: "/illustrations/culture-category.png" },
-  design: { author: "Owen Pike", date: "21 APR 2026", excerpt: "Meet the objects that make a room feel less finished and more alive.", issue: "04", illustration: "/illustrations/find-your-next-story-generated.png" },
-  people: { author: "Nia Bell", date: "24 APR 2026", excerpt: "Meet the makers bending the future into something you can hold.", issue: "04", illustration: "/illustrations/people-category-generated.png" },
-  music: { author: "Jules Hart", date: "27 APR 2026", excerpt: "A field recording of the songs, rooms, and accidents that make a city feel awake.", issue: "04", illustration: "/illustrations/music-category.png" },
-  travel: { author: "Sam Calder", date: "30 APR 2026", excerpt: "A small atlas of detours for people who want to get lost with intention.", issue: "04", illustration: "/illustrations/travel-category.png" },
+gsap.registerPlugin(ScrollTrigger);
+
+const storyMeta: Record<string, { author: string; date: string; excerpt: string; issue: string; illustration: string; photo: string }> = {
+  culture: { author: "Mara Venn", date: "18 APR 2026", excerpt: "A field guide to sentimental clutter, tiny rituals, and the objects that refuse to leave us alone.", issue: "04", illustration: "/illustrations/culture-category.png", photo: "/illustrations/story-culture.jpg" },
+  design: { author: "Owen Pike", date: "21 APR 2026", excerpt: "Meet the objects that make a room feel less finished and more alive.", issue: "04", illustration: "/illustrations/find-your-next-story-generated.png", photo: "/illustrations/story-design.jpg" },
+  people: { author: "Nia Bell", date: "24 APR 2026", excerpt: "Meet the makers bending the future into something you can hold.", issue: "04", illustration: "/illustrations/people-category-generated.png", photo: "/illustrations/story-people.jpg" },
+  music: { author: "Jules Hart", date: "27 APR 2026", excerpt: "A field recording of the songs, rooms, and accidents that make a city feel awake.", issue: "04", illustration: "/illustrations/music-category.png", photo: "/illustrations/story-music.jpg" },
+  travel: { author: "Sam Calder", date: "30 APR 2026", excerpt: "A small atlas of detours for people who want to get lost with intention.", issue: "04", illustration: "/illustrations/travel-category.png", photo: "/illustrations/story-travel.jpg" },
 };
 const categoryInfo: Record<string, { description: string; accent: string }> = {
   culture: { description: "The stuff that sticks: objects, rituals, and the stories we carry without noticing.", accent: "#f8c1ba" },
@@ -16,7 +21,7 @@ const categoryInfo: Record<string, { description: string; accent: string }> = {
   music: { description: "Noise with a pulse: songs, rooms, accidents, and the city between the beats.", accent: "#ac4f98" },
   travel: { description: "Out of office, in mind: scenic routes and detours worth taking on purpose.", accent: "#c94245" },
 };
-const metaFor = (article: Article) => storyMeta[article.slug] ?? { author: "Paper Trail Desk", date: "APR 2026", excerpt: article.dek, issue: "04", illustration: "/illustrations/find-your-next-story-generated.png" };
+const metaFor = (article: Article) => storyMeta[article.slug] ?? { author: "Paper Trail Desk", date: "APR 2026", excerpt: article.dek, issue: "04", illustration: "/illustrations/find-your-next-story-generated.png", photo: "/illustrations/find-your-next-story-generated.png" };
 
 function PlatformFrame({ eyebrow, title, children }: { eyebrow: string; title: string; children: React.ReactNode }) {
   return <main className="platform-page"><header className="platform-header"><Link href="/" className="platform-back">← PAPER TRAIL</Link><span>PAPER TRAIL / ISSUE 04</span><Link href="/stories">STORIES ↗</Link></header><section className="platform-heading"><span className="mono-label">{eyebrow}</span><h1>{title}</h1></section>{children}</main>;
@@ -24,7 +29,7 @@ function PlatformFrame({ eyebrow, title, children }: { eyebrow: string; title: s
 
 function StoryPreview({ article, index = 0, compact = false }: { article: Article; index?: number; compact?: boolean }) {
   const meta = metaFor(article);
-  return <Link href={`/stories/${article.slug}`} className={`story-preview story-preview-${index % 4} ${compact ? "story-preview-compact" : ""}`} style={{ "--story-accent": article.color } as React.CSSProperties}><div className="story-preview-art"><img src={meta.illustration} alt="" /></div><div className="story-preview-copy"><div className="story-preview-top"><span>{article.category} / ISSUE {meta.issue}</span><b>{article.readTime}</b></div><span className="story-preview-index">0{index + 1}</span><h2>{article.title}</h2><p>{meta.excerpt}</p><div className="story-preview-meta"><span>BY {meta.author.toUpperCase()}</span><span>{meta.date}</span></div></div></Link>;
+  return <Link href={`/stories/${article.slug}`} className={`story-preview story-preview-${index % 4} ${compact ? "story-preview-compact" : ""}`} style={{ "--story-accent": article.color } as React.CSSProperties}><div className="story-preview-art"><img src={meta.photo} alt={`${article.category.toLowerCase()} story photograph`} /></div><div className="story-preview-copy"><div className="story-preview-top"><span>{article.category} / ISSUE {meta.issue}</span><b>{article.readTime}</b></div><span className="story-preview-index">0{index + 1}</span><h2>{article.title}</h2><p>{meta.excerpt}</p><div className="story-preview-meta"><span>BY {meta.author.toUpperCase()}</span><span>{meta.date}</span></div></div></Link>;
 }
 
 function FilterBar({ active, onChange }: { active: string; onChange: (filter: string) => void }) {
@@ -50,10 +55,34 @@ export function Stories({ category }: { category?: string }) { return category ?
 export function StoryReader({ slug }: { slug: string }) {
   const article = getArticle(slug);
   const [saved, setSaved] = useState(() => localStorage.getItem(`paper-trail-saved-${slug}`) === "1");
+  const [progress, setProgress] = useState(() => Number(localStorage.getItem(`paper-trail-progress-${slug}`) ?? 0));
+  const root = useRef<HTMLElement>(null);
   if (!article) return <PlatformFrame eyebrow="404 / QUIET TRAIL" title="Story not found."><Link className="pill-button" href="/stories">BACK TO STORIES ↗</Link></PlatformFrame>;
   const meta = metaFor(article);
+  const next = articles[(articles.findIndex((item) => item.slug === slug) + 1) % articles.length];
+  const chapters = [
+    { label: "A THING REMEMBERED", body: article.body[0], image: meta.photo, kind: "scene" },
+    { label: "THE QUESTION UNDERNEATH", body: article.body[1], image: meta.illustration, kind: "character" },
+    { label: "A LITTLE MORE LIGHT", body: article.details[0], image: meta.photo, kind: "wide" },
+    { label: "FIELD NOTE", body: article.details.slice(1).join(" "), image: meta.illustration, kind: "object" },
+  ];
+  useEffect(() => {
+    const key = "paper-trail-opened-stories";
+    const opened = JSON.parse(localStorage.getItem(key) ?? "[]") as string[];
+    localStorage.setItem(key, JSON.stringify(Array.from(new Set([slug, ...opened])).slice(0, 20)));
+    const lenis = new Lenis({ smoothWheel: true });
+    const raf = (time: number) => { lenis.raf(time); };
+    gsap.ticker.add(raf);
+    const context = gsap.context(() => {
+      gsap.from(".reader-story-intro > *", { y: 32, opacity: 0, stagger: .08, duration: .75, ease: "power3.out" });
+      gsap.utils.toArray<HTMLElement>(".story-chapter").forEach((chapter) => gsap.from(chapter, { y: 55, opacity: 0, duration: .75, ease: "power3.out", scrollTrigger: { trigger: chapter, start: "top 82%", once: true } }));
+      gsap.utils.toArray<HTMLElement>(".chapter-art img").forEach((image) => gsap.to(image, { y: -16, rotate: 2, ease: "none", scrollTrigger: { trigger: image, start: "top bottom", end: "bottom top", scrub: true } }));
+      ScrollTrigger.create({ trigger: root.current, start: "top top", end: "bottom bottom", onUpdate: (self) => { const value = Math.round(self.progress * 100); setProgress(value); localStorage.setItem(`paper-trail-progress-${slug}`, String(value)); if (value > 96) localStorage.setItem(`paper-trail-completed-${slug}`, "1"); } });
+    }, root);
+    return () => { context.revert(); lenis.destroy(); gsap.ticker.remove(raf); };
+  }, [slug]);
   const toggleSaved = () => { const next = !saved; setSaved(next); localStorage.setItem(`paper-trail-saved-${slug}`, next ? "1" : "0"); };
-  return <main className="reader-page" style={{ "--story-accent": article.color } as React.CSSProperties}><header className="platform-header"><Link href="/stories">← STORIES</Link><span>ISSUE {meta.issue} / {article.category}</span><button className="reader-save" onClick={toggleSaved}>{saved ? "SAVED ✓" : "SAVE STORY +"}</button></header><section className="reader-hero"><span className="mono-label">{article.category} / ISSUE {meta.issue} / {article.readTime}</span><h1>{article.title}</h1><p>{meta.excerpt}</p><div className="reader-byline"><span>WORDS BY <b>{meta.author.toUpperCase()}</b></span><span>PUBLISHED {meta.date}</span><span>{article.readTime} READ</span></div></section><article className="reader-body"><aside><span>FIELD NOTE</span><span>04—{article.category.slice(0, 2)}</span></aside><div>{article.body.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}<blockquote>{article.pullQuote}</blockquote>{article.details.map((detail, index) => <div className="reader-detail" key={detail}><b>0{index + 1}</b><span>{detail}</span></div>)}</div></article><footer className="reader-footer"><Link className="outline-button" href="/stories">ALL STORIES ↗</Link><Link className="pill-button" href={`/stories/${articles[(articles.findIndex((item) => item.slug === slug) + 1) % articles.length].slug}`}>NEXT STORY →</Link></footer></main>;
+  return <main ref={root} className="reader-page story-reader-page" style={{ "--story-accent": article.color } as React.CSSProperties}><header className="platform-header"><Link href="/stories">← STORIES</Link><span>ISSUE {meta.issue} / {article.category}</span><button className="reader-save" onClick={toggleSaved}>{saved ? "SAVED ✓" : "SAVE STORY +"}</button></header><div className="reader-progress"><span>CHAPTER {Math.min(7, Math.max(1, Math.ceil((progress / 100) * 7)))} / 07</span><i><b style={{ width: `${progress}%` }} /></i><strong>{progress}%</strong></div><section className="reader-story-intro"><div><span className="mono-label">{article.category} / ISSUE {meta.issue} / {article.readTime}</span><h1>{article.title}</h1><p>{meta.excerpt}</p><div className="reader-byline"><span>WORDS BY <b>{meta.author.toUpperCase()}</b></span><span>PUBLISHED {meta.date}</span></div></div><div className="reader-intro-art"><img src={meta.illustration} alt={`${article.category.toLowerCase()} story illustration`} /><span>FIELD NOTE 04—{article.category.slice(0, 2)}</span></div></section><article className="story-chapters">{chapters.map((chapter, index) => <section className={`story-chapter chapter-${chapter.kind}`} key={chapter.label}><div className="chapter-label"><span>CHAPTER 0{index + 1}</span><b>{chapter.label}</b></div><div className="chapter-content"><div className="chapter-art"><img src={chapter.image} alt="" /><span className="chapter-sticker">FOLLOW<br />THIS ↘</span></div><div className="chapter-copy"><p>{chapter.body}</p>{index === 1 && <blockquote>{article.pullQuote}</blockquote>}{index === 3 && <div className="speech-bubble">A story is a door.<br /><b>Keep it open.</b></div>}</div></div></section>)}</article><section className="next-trail"><span className="mono-label">YOU FOLLOWED {article.category}.</span><h2>NOW TRY<br /><em>{next.category}.</em></h2><p>{metaFor(next).excerpt}</p><Link className="pill-button" href={`/stories/${next.slug}`}>NEXT TRAIL →</Link></section></main>;
 }
 
 export function Issues() { return <PlatformFrame eyebrow="THE ARCHIVE" title="Every issue leaves a trace."><div className="issue-grid"><Link href="/issues/04" className="issue-card issue-current"><span>ISSUE 04</span><strong>THE SCENIC<br /><em>ROUTE.</em></strong><small>APRIL 2026 / FIVE WAYS IN</small><b>OPEN ISSUE ↗</b></Link>{["03 / OBJECTS IN MOTION", "02 / THE LONG WAY ROUND", "01 / BEGIN SOMEWHERE"].map((issue) => <div className="issue-card" key={issue}><span>{issue}</span><strong>FIELD<br />NOTES.</strong><small>ARCHIVED EDITION</small><b>COMING SOON</b></div>)}</div></PlatformFrame>; }
