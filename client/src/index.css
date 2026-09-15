@@ -327,3 +327,9 @@ html, body, #root { max-width:100%; overflow-x:hidden; }.intro-bottom p b { colo
 .topbar-login { background:var(--cream); color:var(--ink); }
 .topbar-signup { background:var(--yellow); color:var(--ink); }
 @media (max-width:720px) { .topbar { left:12px; right:12px; top:12px; }.topbar-actions { gap:5px; }.topbar-actions .topbar-login, .topbar-actions .topbar-signup { display:none; } }
+
+/* Stories index illustration cards */
+.story-preview-art img { object-fit:contain; padding:12px; }
+.story-preview-compact .story-preview-art img { object-fit:contain; padding:8px; }
+
+.story-read-link { display:inline-flex; align-items:center; gap:8px; width:max-content; margin-top:14px; padding:9px 12px; border:2px solid var(--ink); border-radius:999px; font:10px var(--mono); font-weight:700; background:var(--cream); color:var(--ink); }.story-preview:hover .story-read-link { background:var(--yellow); }

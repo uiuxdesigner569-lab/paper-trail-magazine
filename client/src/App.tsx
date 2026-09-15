@@ -22,11 +22,6 @@ function Router() {
   return <Switch>
     <Route path="/" component={Home} />
     <Route path="/stories" component={() => <Stories />} />
-    <Route path="/stories/culture" component={() => <Stories category="culture" />} />
-    <Route path="/stories/design" component={() => <Stories category="design" />} />
-    <Route path="/stories/people" component={() => <Stories category="people" />} />
-    <Route path="/stories/music" component={() => <Stories category="music" />} />
-    <Route path="/stories/travel" component={() => <Stories category="travel" />} />
     <Route path="/stories/:slug" component={(params) => <StoryReader slug={params.params.slug} />} />
     <Route path="/issues" component={Issues} />
     <Route path="/issues/:issue" component={(params) => <IssueDetail issue={params.params.issue} />} />

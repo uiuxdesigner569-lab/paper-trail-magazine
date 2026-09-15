@@ -29,18 +29,18 @@ function PlatformFrame({ eyebrow, title, children }: { eyebrow: string; title: s
 
 function StoryPreview({ article, index = 0, compact = false }: { article: Article; index?: number; compact?: boolean }) {
   const meta = metaFor(article);
-  return <Link href={`/stories/${article.slug}`} className={`story-preview story-preview-${index % 4} ${compact ? "story-preview-compact" : ""}`} style={{ "--story-accent": article.color } as React.CSSProperties}><div className="story-preview-art"><img src={meta.photo} alt={`${article.category.toLowerCase()} story photograph`} /></div><div className="story-preview-copy"><div className="story-preview-top"><span>{article.category} / ISSUE {meta.issue}</span><b>{article.readTime}</b></div><span className="story-preview-index">0{index + 1}</span><h2>{article.title}</h2><p>{meta.excerpt}</p><div className="story-preview-meta"><span>BY {meta.author.toUpperCase()}</span><span>{meta.date}</span></div></div></Link>;
+  return <Link href={`/stories/${article.slug}`} className={`story-preview story-preview-${index % 4} ${compact ? "story-preview-compact" : ""}`} style={{ "--story-accent": article.color } as React.CSSProperties}><div className="story-preview-art"><img src={meta.illustration} alt={`${article.category.toLowerCase()} story illustration`} /></div><div className="story-preview-copy"><div className="story-preview-top"><span>{article.category} / ISSUE {meta.issue}</span><b>{article.readTime}</b></div><span className="story-preview-index">0{index + 1}</span><h2>{article.title}</h2><p>{meta.excerpt}</p><div className="story-preview-meta"><span>BY {meta.author.toUpperCase()}</span><span>{article.readTime} READ</span></div><span className="story-read-link">READ STORY →</span></div></Link>;
 }
 
 function FilterBar({ active, onChange }: { active: string; onChange: (filter: string) => void }) {
-  const filters = ["ALL", "CULTURE", "DESIGN", "PEOPLE", "MUSIC", "TRAVEL", "LATEST", "EDITOR'S PICKS", "ISSUE 04", "ISSUE 03"];
+  const filters = ["ALL", "CULTURE", "DESIGN", "PEOPLE", "MUSIC", "TRAVEL"];
   return <nav className="story-filters" aria-label="Story filters">{filters.map((filter) => <button key={filter} className={active === filter ? "is-active" : ""} onClick={() => onChange(filter)}>{filter}</button>)}</nav>;
 }
 
 function StoryIndex() {
   const [filter, setFilter] = useState("ALL");
-  const filtered = filter === "ALL" || filter === "LATEST" || filter === "EDITOR'S PICKS" || filter === "ISSUE 04" ? articles : filter === "ISSUE 03" ? [] : articles.filter((article) => article.category === filter);
-  return <PlatformFrame eyebrow="THE STORY INDEX / FIVE WAYS IN" title="Follow the trail."><div className="stories-intro"><p>A magazine you explore, not just scroll. Choose a thread, follow a color, and let one story point toward another.</p><Link className="pill-button" href="/issues/04">READ ISSUE 04 ↗</Link></div><FilterBar active={filter} onChange={setFilter} />{filter === "ISSUE 03" && <div className="story-empty"><span className="mono-label">ISSUE 03 / ARCHIVE</span><h2>The old trail is still being mapped.</h2><p>Older stories are coming soon.</p></div>}<div className="story-masonry">{filtered.map((article, index) => <StoryPreview key={article.slug} article={article} index={index} />)}</div></PlatformFrame>;
+  const filtered = filter === "ALL" ? articles : articles.filter((article) => article.category === filter);
+  return <PlatformFrame eyebrow="THE STORY INDEX / FIVE WAYS IN" title="EXPLORE STORIES"><div className="stories-intro"><p>A magazine you explore, not just scroll. Choose a category, follow a color, and let one story point toward another.</p><span className="mono-label">{filtered.length} STORIES / ISSUE 04</span></div><FilterBar active={filter} onChange={setFilter} /><div className="story-masonry">{filtered.map((article, index) => <StoryPreview key={article.slug} article={article} index={index} />)}</div></PlatformFrame>;
 }
 
 function CategoryPage({ category }: { category: string }) {
