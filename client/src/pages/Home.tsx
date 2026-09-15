@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import gsap from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -36,46 +36,30 @@ function OrbitGlyph() {
   return <svg className="orbit-glyph" viewBox="0 0 320 220" aria-hidden="true"><path d="M21 119 C63 11 234 -9 299 89 C350 166 242 222 114 193 C44 177 8 151 21 119Z" fill="none" stroke="#000" strokeWidth="5" /><circle cx="72" cy="87" r="18" fill="#f8c1ba" stroke="#000" strokeWidth="5" /><circle cx="253" cy="141" r="13" fill="#b5c995" stroke="#000" strokeWidth="5" /><path d="M144 108 l29 -30 30 27 -29 31Z" fill="#f4ed36" stroke="#000" strokeWidth="5" /></svg>;
 }
 
-const categories = [
-  { name: "CULTURE", slug: "culture", note: "the stuff that sticks", color: "#f8c1ba", shape: "circle" },
-  { name: "DESIGN", slug: "design", note: "objects with opinions", color: "#b5c995", shape: "square" },
-  { name: "PEOPLE", slug: "people", note: "the beautiful weirdos", color: "#f9cc73", shape: "star" },
-  { name: "MUSIC", slug: "music", note: "noise with a pulse", color: "#ac4f98", shape: "wave" },
-  { name: "TRAVEL", slug: "travel", note: "out of office, in mind", color: "#c94245", shape: "arrow" },
+type MagazineCategory = {
+  name: string;
+  slug: string;
+  illustration: string;
+  label: string;
+  accentColor: string;
+};
+
+export const magazineCategories: MagazineCategory[] = [
+  { name: "CULTURE", slug: "culture", illustration: "/illustrations/culture.svg", label: "the stuff that sticks", accentColor: "#f8c1ba" },
+  { name: "DESIGN", slug: "design", illustration: "/illustrations/design.svg", label: "objects with opinions", accentColor: "#b5c995" },
+  { name: "PEOPLE", slug: "people", illustration: "/illustrations/people.svg", label: "the beautiful weirdos", accentColor: "#f9cc73" },
+  { name: "MUSIC", slug: "music", illustration: "/illustrations/music.svg", label: "noise with a pulse", accentColor: "#ac4f98" },
+  { name: "TRAVEL", slug: "travel", illustration: "/illustrations/travel.svg", label: "out of office, in mind", accentColor: "#c94245" },
 ];
-const pickCategories = categories.filter((category) => category.name !== "CULTURE");
 
-function DoorArt({ index }: { index: number }) {
-  const [open, setOpen] = useState(false);
-  return <div className={`door-illustration door-${index + 1} ${open ? "is-open" : ""}`} onClick={() => setOpen((value) => !value)} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") setOpen((value) => !value); }} aria-label="Open door"><div className="door-particles"><i>✦</i><i>✳</i><i>↗</i><i>•</i></div><div className="door-panel"><span className="door-number">0{index + 1}</span><span className="door-knob" /></div><div className="door-light" /><span className="door-open-label">{open ? "CLOSE DOOR" : "OPEN DOOR"}</span></div>;
-}
-
-function CategoryArt({ active }: { active: number }) {
-  const item = pickCategories[active];
-  useEffect(() => {
-    const card = document.querySelector<HTMLElement>(".category-art");
-    if (!card) return;
-    gsap.fromTo(card, { opacity: 0, scale: .96, y: -30 }, { opacity: 1, scale: 1, y: 0, duration: .42, ease: "power3.out", overwrite: true });
-  }, [active]);
-  return <div className={`category-art door-card door-card-${active + 1}`} style={{ background: item.color }}><DoorArt index={active} /><span className="art-caption">FIELD NOTE 0{active + 1}</span><span className="category-card-name">{item.name}</span></div>;
-}
-
-function CategoryArtStatic({ item, index }: { item: typeof pickCategories[number]; index: number }) {
-  return <div className={`category-art category-art-static door-card door-card-${index + 1}`} style={{ background: item.color }}><DoorArt index={index} /><span className="art-caption">FIELD NOTE 0{index + 1}</span><span className="category-card-name">{item.name}</span></div>;
+function CategoryIllustration({ category }: { category: MagazineCategory }) {
+  return <img className="category-showcase-illustration" src={category.illustration} alt="" aria-hidden="true" />;
 }
 
 export default function Home() {
   const root = useRef<HTMLElement>(null);
-  const [activeCategory, setActiveCategory] = useState(0);
   const [sceneLabel, setSceneLabel] = useState("OPENING NOTE");
   const [introEntered, setIntroEntered] = useState(() => window.sessionStorage.getItem("paper-trail-intro-entered") === "1");
-  const categoryIndex = useRef(0);
-
-  useEffect(() => {
-    const title = document.querySelector<HTMLElement>(".category-active-title");
-    if (!title) return;
-    gsap.fromTo(title, { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: .38, ease: "power3.out", overwrite: true });
-  }, [activeCategory]);
 
   const enterSite = () => {
     window.sessionStorage.setItem("paper-trail-intro-entered", "1");
@@ -153,37 +137,14 @@ export default function Home() {
         .to(".journey-copy", { opacity: 0.12, duration: 0.2, ease: "none" }, 0.8)
         .to(".journey-mascot", { x: 130, y: -150, scale: 0.76, opacity: 0, duration: 0.2, ease: "none" }, 0.84);
 
-      const exploreMedia = gsap.matchMedia();
-      exploreMedia.add("(min-width: 721px)", () => {
-        const exploreTimeline = gsap.timeline({
-          scrollTrigger: {
-            trigger: ".explore",
-            start: "top top",
-            end: "bottom bottom",
-            pin: ".category-pin",
-            pinSpacing: true,
-            scrub: 1,
-            anticipatePin: 1,
-            onEnter: () => setScene("PICK A DOOR"),
-            onEnterBack: () => setScene("PICK A DOOR"),
-            onUpdate: (self) => {
-              const next = Math.min(pickCategories.length - 1, Math.floor(self.progress * pickCategories.length));
-              if (next !== categoryIndex.current) {
-                const currentTitle = document.querySelector<HTMLElement>(".category-active-title");
-                const currentCard = document.querySelector<HTMLElement>(".category-art");
-                categoryIndex.current = next;
-                gsap.to(currentTitle, { opacity: 0, y: -30, duration: .18, overwrite: true, ease: "power2.in" });
-                gsap.to(currentCard, { opacity: 0, scale: .96, y: -30, duration: .18, overwrite: true, ease: "power2.in", onComplete: () => setActiveCategory(next) });
-              }
-              gsap.set(".category-progress i", { width: `${self.progress * 100}%` });
-            },
-          },
-        });
-        exploreTimeline
-          .fromTo(".category-list", { x: 0 }, { x: -72, duration: 1, ease: "none" }, 0)
-          .fromTo(".category-art", { x: 90, rotate: -4 }, { x: -90, rotate: 4, duration: 1, ease: "none" }, 0)
-          .fromTo(".category-progress i", { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 1, ease: "none" }, 0);
-        return () => exploreTimeline.kill();
+      gsap.from(".category-showcase-card", {
+        scrollTrigger: { trigger: ".category-showcase", start: "top 72%", toggleActions: "play none none reverse" },
+        y: 90,
+        opacity: 0,
+        rotate: 4,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: "power3.out",
       });
 
       gsap.timeline({
@@ -350,9 +311,19 @@ export default function Home() {
       </div>
     </section>
 
-    <section className="explore" id="explore">
-      <div className="category-pin"><div className="explore-heading"><span className="mono-label">02 / PICK A DOOR</span><h2>EXPLORE<br /><span>THE ISSUE</span></h2></div><div className="category-list"><div className="category-option active" key={pickCategories[activeCategory].name}><a className="category-active-title" href={`/article/${pickCategories[activeCategory].slug}`}><span>{pickCategories[activeCategory].name}</span><small>{pickCategories[activeCategory].note}</small><b>↗</b></a></div></div><CategoryArt active={activeCategory} /><div className="category-progress"><span>0{activeCategory + 1}</span><div><i style={{ width: `${((activeCategory + 1) / pickCategories.length) * 100}%` }} /></div><span>0{pickCategories.length}</span></div></div>
-      <div className="category-mobile-sequence"><div className="explore-heading"><span className="mono-label">02 / PICK A DOOR</span><h2>EXPLORE<br /><span>THE ISSUE</span></h2></div>{pickCategories.map((cat, index) => <article className="category-mobile-step" key={cat.name}><a href={`/article/${cat.slug}`} className="category-active-title"><span>{cat.name}</span><small>{cat.note}</small><b>↗</b></a><CategoryArtStatic item={cat} index={index} /></article>)}</div>
+    <section className="category-showcase" id="explore" aria-labelledby="explore-magazine-title">
+      <div className="category-showcase-topline"><span className="mono-label">02 / FIND YOUR NEXT STORY</span><span className="mono-label">PAPER TRAIL / ISSUE 04</span></div>
+      <h2 id="explore-magazine-title" className="category-showcase-title">EXPLORE<br /><span>THE MAGAZINE</span></h2>
+      <img className="find-story-illustration" src="/illustrations/find-your-next-story.svg" alt="Open magazine with a tiny character following a winding story path" />
+      <div className="category-showcase-grid">
+        {magazineCategories.map((category, index) => <a className="category-showcase-card" href={`/article/${category.slug}`} key={category.slug} style={{ "--category-accent": category.accentColor } as CSSProperties}>
+          <span className="category-showcase-index">0{index + 1}</span>
+          <div className="category-showcase-art"><CategoryIllustration category={category} /></div>
+          <span className="category-showcase-button">{category.name}<b>↗</b></span>
+          <span className="category-showcase-label">{category.label}</span>
+        </a>)}
+      </div>
+      <div className="category-showcase-footer"><span>FIVE WAYS IN</span><span>CHOOSE A THREAD AND FOLLOW IT</span><span>↓</span></div>
     </section>
 
     <section className="scene story-one">
