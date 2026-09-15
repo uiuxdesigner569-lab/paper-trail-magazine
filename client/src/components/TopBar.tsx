@@ -4,13 +4,16 @@ import { cartCount, readCart } from "../lib/cart";
 
 const links = [
   ["THE ISSUE", "/"],
+  ["STORIES", "/stories"],
   ["SHOP", "/shop"],
   ["ABOUT PAPER TRAIL", "/about"],
-  ["CULTURE", "/article/culture"],
-  ["DESIGN", "/article/design"],
-  ["PEOPLE", "/article/people"],
-  ["MUSIC", "/article/music"],
-  ["TRAVEL", "/article/travel"],
+  ["CULTURE", "/stories/culture"],
+  ["DESIGN", "/stories/design"],
+  ["PEOPLE", "/stories/people"],
+  ["MUSIC", "/stories/music"],
+  ["TRAVEL", "/stories/travel"],
+  ["LOG IN", "/login"],
+  ["SIGN UP", "/signup"],
 ] as const;
 
 export default function TopBar() {

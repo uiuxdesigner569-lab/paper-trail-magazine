@@ -47,9 +47,9 @@ type MagazineCategory = {
 export const magazineCategories: MagazineCategory[] = [
   { name: "CULTURE", slug: "culture", illustration: "/illustrations/culture-category.png", label: "the stuff that sticks", accentColor: "#f8c1ba" },
   { name: "DESIGN", slug: "design", illustration: "/illustrations/find-your-next-story.png", label: "objects with opinions", accentColor: "#b5c995" },
-  { name: "PEOPLE", slug: "people", illustration: "/illustrations/people-category.png", label: "the beautiful weirdos", accentColor: "#f9cc73" },
-  { name: "MUSIC", slug: "music", illustration: "/illustrations/music.svg", label: "noise with a pulse", accentColor: "#ac4f98" },
-  { name: "TRAVEL", slug: "travel", illustration: "/illustrations/travel.svg", label: "out of office, in mind", accentColor: "#c94245" },
+  { name: "PEOPLE", slug: "people", illustration: "/illustrations/people-category-generated.png", label: "the beautiful weirdos", accentColor: "#f9cc73" },
+  { name: "MUSIC", slug: "music", illustration: "/illustrations/music-category.png", label: "noise with a pulse", accentColor: "#ac4f98" },
+  { name: "TRAVEL", slug: "travel", illustration: "/illustrations/travel-category.png", label: "out of office, in mind", accentColor: "#c94245" },
 ];
 
 function CategoryIllustration({ category }: { category: MagazineCategory }) {
@@ -88,7 +88,6 @@ export default function Home() {
     const ctx = gsap.context(() => {
       gsap.from(".intro-brand", { y: -24, opacity: 0, duration: 0.8, ease: "power3.out" });
       gsap.from(".intro-word", { yPercent: 110, rotate: 4, stagger: 0.12, duration: 1.15, delay: 0.25, ease: "power4.out" });
-      gsap.from(".intro-mascot", { x: 120, y: 90, rotate: 10, opacity: 0, duration: 1.1, delay: 0.55, ease: "back.out(1.5)" });
       gsap.from(".intro-cta", { y: 25, opacity: 0, duration: 0.7, delay: 1.1, ease: "power3.out" });
 
       const globalProgress = ScrollTrigger.create({
@@ -112,7 +111,6 @@ export default function Home() {
         },
       })
         .to(".intro-title", { yPercent: -28, scale: 0.74, duration: 0.45, ease: "none" }, 0)
-        .to(".intro-mascot", { x: -190, y: 175, rotate: -18, scale: 1.18, duration: 0.55, ease: "none" }, 0)
         .to(".intro-bottom", { y: 82, opacity: 0, duration: 0.3, ease: "none" }, 0.18)
         .to(".intro-stage", { backgroundColor: "#f9cc73", duration: 0.14, ease: "none" }, 0.84)
         .to(".intro-title", { opacity: 0.25, duration: 0.14, ease: "none" }, 0.84);
@@ -177,7 +175,7 @@ export default function Home() {
         },
       })
         .fromTo(".transition-pal", { scale: 0.8, rotate: -10, y: 80 }, { scale: 1.38, rotate: 16, y: -70, duration: 0.65, ease: "none" }, 0)
-        .fromTo(".transition-word", { xPercent: -18 }, { xPercent: 10, duration: 0.65, ease: "none" }, 0);
+        .fromTo(".transition-word", { xPercent: -10 }, { xPercent: 0, duration: 0.65, ease: "none" }, 0);
 
       gsap.timeline({
         scrollTrigger: {
@@ -314,7 +312,7 @@ export default function Home() {
     <section className="category-showcase" id="explore" aria-labelledby="explore-magazine-title">
       <div className="category-showcase-topline"><span className="mono-label">02 / FIND YOUR NEXT STORY</span><span className="mono-label">PAPER TRAIL / ISSUE 04</span></div>
       <h2 id="explore-magazine-title" className="category-showcase-title">EXPLORE<br /><span>THE MAGAZINE</span></h2>
-      <img className="find-story-illustration" src="/illustrations/find-your-next-story.svg" alt="Open magazine with a tiny character following a winding story path" />
+      <img className="find-story-illustration" src="/illustrations/find-your-next-story-generated.png" alt="Paper trail explorer holding a map and book" />
       <div className="category-showcase-grid">
         {magazineCategories.map((category, index) => <a className="category-showcase-card" href={`/article/${category.slug}`} key={category.slug} style={{ "--category-accent": category.accentColor } as CSSProperties}>
           <span className="category-showcase-index">0{index + 1}</span>
